@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html>
+   <head>
+      <script type = "text/javascript">
+
+        window.onload = function() {
+          getLocation();
+        };
+
+         function showLocation(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            var latlongvalue = position.coords.latitude + ","
+                              + position.coords.longitude;
+
+            const toast = document.getElementById('toast');
+
+            document.getElementById('hideBtn').addEventListener('click', function() {
+                toast.classList.remove('visible');
+            });
+
+            fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latlongvalue}&key=AIzaSyBm1IHCdNsqfk5MzhNRmu5NIVebUUGWtmQ`)
+
+            .then((responseText) => {
+                return responseText.json();
+            })
+            .then(jsonData => {
+                console.log(jsonData.results[0].formatted_address); //111 Wellington St, Ottawa, ON K1A 0A9, Canada
+                  toast.querySelector('.toast-body').innerHTML = (jsonData.results[0].formatted_address);
+                  toast.classList.add('visible');
+            })
+            .catch(error => {
+                console.log(error);
+
+              })
+
+         }
+         function errorHandler(err) {
+            if(err.code == 1) {
+               alert("Error: Access is denied!");
+            }else if( err.code == 2) {
+               alert("Error: Position is unavailable!");
+            }
+         }
+         function getLocation(){
+            if(navigator.geolocation){
+               // timeout at 60000 milliseconds (60 seconds)
+               var options = {timeout:60000};
+               navigator.geolocation.getCurrentPosition
+               (showLocation, errorHandler, options);
+            }else{
+               alert("Sorry, browser does not support geolocation!");
+            }
+         }
+      </script>
+
+      <style>
+
+              .toast {
+                  position: fixed;
+                  bottom: 0;
+                  right: 0;
+
+                  transform: translateY(100%);
+                  opacity: 0;
+
+                  transition:
+                      opacity 500ms,
+                      transform 500ms;
+              }
+
+              .toast.visible {
+                  transform: translateY(0);
+                  opacity: 1;
+              }
+
+              .toast-body {
+                  margin: 28px;
+                  padding: 20px 24px;
+
+                  font-size: larger;
+                  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+                  background-color: lightskyblue;
+                  color: darkblue;
+
+                  border-radius: 4px;
+              }
+          </style>
+
+   </head>
+   <body>
+      <button id="hideBtn">Close Popup</button>
+
+
+      <div style="max-width: 500px; margin: auto;">
+          <audio src="https://s2.radio.co/s4bd265641/listen" controls></audio>
+      </div>
+
+      
+      <div class="toast" id="toast">
+          <div class="toast-body">
+          </div>
+      </div>
+
+   </body>
+</html>
